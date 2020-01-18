@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="/static/js/jquery-3.4.1.min.js"></script>
+	{% block title %}
+	<title>ВГТРК - закупочный поисковик (УИИ)</title>
+	{% endblock %}
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">ВГТРК закупки</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+	{% if page == 'main' %}
+      	<li class="nav-item active">
+	{% else %}
+		<li class="nav-item">
+	{% endif %}
+        	<a class="nav-link" href="{{ url_for('index') }}">Главная<span class="sr-only">(current)</span></a>
+      	</li>
+	{% if page == 'query' %}
+      	<li class="nav-item active">
+	{% else %}
+		<li class="nav-item">
+	{% endif %}
+        	<a class="nav-link" href="{{ url_for('query') }}">Запрос</a>
+      	</li>
+	{% if page == 'contacts' %}
+      	<li class="nav-item active">
+	{% else %}
+		<li class="nav-item">
+	{% endif %}
+        	<a class="nav-link" href="{{ url_for('contacts') }}">Контакты</a>
+      	</li>
+    </ul>
+	{% if page != 'query' %}
+    <form action="{{ url_for('result') }}" method="POST" class="form-inline my-2 my-lg-0">
+      <input name="name" class="form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Поиск</button>
+    </form>
+	{% endif %}
+  </div>
+</nav>
+	<hr />
+  <div class="container">
+	{% block body %}
+
+	{% endblock %}
+	<hr />
+
+	<footer>
+		<p><a class="text-decoration-none" href="https://neural-university.ru/">Университет искуственного интеллекта</a> &copy; 2020</p>
+		<p><a class="text-decoration-none" href="https://www.facebook.com/evgeny.makhankov">Evgeny Makhankov</a> &copy; 2020</p>
+	</footer>
+  </div>
+</body>
+</html>

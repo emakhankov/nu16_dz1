@@ -1,0 +1,22 @@
+{% set page = 'query' %}
+{% extends 'base.html' %}
+{% block body %}
+<h2 class="text-center">Параметры запроса</h2>
+<br/>
+<br/>
+<form action="{{ url_for('result') }}" method="POST"  >
+    <div class="form-group">
+        <label for="id_num">Номер закупки</label>
+        <input type="input" class="form-control" id="id_num" name="num" aria-describedby="id_num_help" placeholder="введите номер">
+        <small id="id_num_help" class="form-text text-muted">Номер закупки в формате хххх/хх/хх (если известен)</small>
+  </div>
+  <div class="form-group">
+        <label for="id_name">Текст</label>
+        <input type="input" class="form-control" id="id_name" name="name" aria-describedby="id_name_help" placeholder="Наименование закупки">
+  </div>
+    <button type="submit" class="btn btn-primary">Искать</button>
+</form>
+<br/>
+<p>Также можно скачать данные формате <a href="{{ url_for('excel') }}">EXCEL</a></p>
+<br/>
+{% endblock %}
