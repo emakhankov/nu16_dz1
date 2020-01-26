@@ -4,8 +4,7 @@ import json
 import pandas as pd
 import pathlib
 import os
-import time
-
+import service.VGTRKBase as VGTRKBase
 
 def get_settings():
     parent_dir = pathlib.Path(__file__).parent.absolute()
@@ -23,16 +22,15 @@ parse_url = settings['PARSE_URL']
 output_excel = settings['OUTPUT_EXCEL']
 
 
-def create_dataframe(data, url):
+def create_dataframe(data):
 
     df = pd.DataFrame(data, columns=['num', 'href', 'customer', 'description', 'price', 'start', 'finish', 'state'])
     df[['start', 'finish']] = df[['start', 'finish']].apply(pd.to_datetime)
     df[['price']] = df[['price']].apply(pd.to_numeric)
-    df['href'] = df['href'].apply(lambda x: f'{url}{x}')
     return df
 
 
-def get_data(url, rows):
+def get_data_page(url):
 
     print('gathering from:', url)
 
@@ -80,58 +78,51 @@ def get_data(url, rows):
 
             row_dict['state'] = td_table_body[6].text
 
-            rows.append(row_dict)
+            result = VGTRKBase.update_row(row_dict)
 
-        return False
+            if not result:
+                return False
+        return True
 
     else:
 
-        return True
+        return False
 
 
-def get_excel():
+def get_data():
 
     i = 0
-    rows = []
     while True:
         i += 1
-        return_value = get_data(f'{domain_url}{parse_url}/page/{i}', rows)
-        if return_value:
+        return_value = get_data_page(f'{domain_url}{parse_url}/page/{i}')
+        if not return_value:
             break
-
-    df = create_dataframe(rows, domain_url)
-    df.to_excel(output_excel, engine='xlsxwriter')
+    VGTRKBase.set_hour()
 
 
 def verify_up_to_date():
 
-    if not os.path.isfile(output_excel):
-        get_excel()
-    else:
-        time_creation = os.path.getctime(output_excel)
-        time_now = time.time()
-        diff_sec = time_now - time_creation
-        if diff_sec > 3600.0:
-            get_excel()
-
-
-def read_from_excel():
-
-    verify_up_to_date()
-    df = pd.read_excel(output_excel, sheet_name='Sheet1', index_col=0)
-    return df
+    if VGTRKBase.verify_hour():
+        get_data()
 
 
 def get_by_nomer(num):
 
-    df = read_from_excel()
-    row = df.loc[df['num'] == num]
-    return row
+    verify_up_to_date()
+    rows = VGTRKBase.get_rows(num, '')
+    return rows
 
 
 def get_by_description(description):
 
-    df = read_from_excel()
-    row = df.loc[df['description'].str.contains(description.lower(), case=True)]
-    return row
+    verify_up_to_date()
+    rows = VGTRKBase.get_rows('', description)
+    return rows
 
+
+def get_excel():
+
+    verify_up_to_date()
+    rows = VGTRKBase.get_rows('', '')
+    df = create_dataframe(rows)
+    df.to_excel(output_excel, engine='xlsxwriter')

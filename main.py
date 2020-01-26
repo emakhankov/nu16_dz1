@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, abort, redirect, url_for, sen
 import service.VGTRKService as VGTRKService
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False  # для того чтоы jsonify  возвращал в UTF-8 без кодов
 
 
 @app.route("/")
@@ -35,6 +36,7 @@ def result():
     else:
         abort(404)
 
+
 @app.route("/api/")
 def api():
     num = request.args.get('num', '')
@@ -45,8 +47,8 @@ def api():
         rows = VGTRKService.get_by_description(name)
     else:
         rows = VGTRKService.get_by_description('')
-    json = rows.reset_index().to_json(orient='records', force_ascii=False)
-    return json
+    return jsonify(rows)
+
 
 @app.route("/result/", methods=['GET'])
 def result_get():
@@ -56,11 +58,10 @@ def result_get():
 @app.route("/excel/", methods=['POST', 'GET'])
 def excel():
     try:
-        VGTRKService.verify_up_to_date()
-        return send_file(VGTRKService.output_excel, attachment_filename='data.xlsx')
+        VGTRKService.get_excel()
+        return send_file(VGTRKService.output_excel, as_attachment=True,  attachment_filename='data.xlsx')
     except Exception as e:
         return str(e)
-
 
 
 if __name__ == "__main__":
