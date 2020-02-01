@@ -22,9 +22,9 @@
             Сумма
         </th>
     </tr>
-    {% for index, row in rows.iterrows() %}
+    {% for row in rows %}
     <tr>
-        <td><a href="{{ row.href }}" target="_blank">{{ row.num }}</a></td>
+        <td><a href="http://tendering.vgtrk.com{{ row.href }}" target="_blank">{{ row.num }}</a></td>
         <td>{{ row.customer }}</td>
         <td>{{ row.description }}</td>
         <td>{{ row.price }}</td>
