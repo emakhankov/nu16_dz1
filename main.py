@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, abort, redirect, url_for, send_file, jsonify
+from flask import make_response
 import service.VGTRKService as VGTRKService
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False  # для того чтоы jsonify  возвращал в UTF-8 без кодов
@@ -57,9 +59,13 @@ def result_get():
 
 @app.route("/excel/", methods=['POST', 'GET'])
 def excel():
+
     try:
         VGTRKService.get_excel()
-        return send_file(VGTRKService.output_excel, as_attachment=True,  attachment_filename='data.xlsx')
+        response = make_response(send_file(VGTRKService.output_excel, as_attachment=True,  attachment_filename='data.xlsx'))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        return response
     except Exception as e:
         return str(e)
 
